@@ -1,9 +1,10 @@
 package repositoryMySql
 
 import (
+	"altech-omega-api/domain"
 	"database/sql"
 	"fmt"
-	"altech-omega-api/domain"
+
 	"github.com/google/uuid"
 )
 
@@ -49,7 +50,7 @@ func (repo *authorRepo) GetByID(id string) (domain.Author, error) {
 	var data domain.Author
 
 	err := row.Scan(&data.ID, &data.Name, &data.Bio, &data.BirthDate,
-			&data.Nationality, &data.CreatedAt, &data.UpdatedAt)
+		&data.Nationality, &data.CreatedAt, &data.UpdatedAt)
 	if err != nil {
 		return data, err
 	}
@@ -62,7 +63,7 @@ func (repo *authorRepo) GetByID(id string) (domain.Author, error) {
 }
 
 func (repo *authorRepo) GetByIDWithBooks(id string) (domain.Author, error) {
-	query:= `
+	query := `
 	SELECT 
 		au.id,
 		au.name,
@@ -89,8 +90,6 @@ func (repo *authorRepo) GetByIDWithBooks(id string) (domain.Author, error) {
 	var data domain.Author
 	var books []domain.Book
 
-	
-
 	for rows.Next() {
 		var book domain.Book
 
@@ -113,7 +112,6 @@ func (repo *authorRepo) GetByIDWithBooks(id string) (domain.Author, error) {
 	return data, err
 }
 
-
 func (repo *authorRepo) Create(author *domain.Author) error {
 	newUUID, _ := uuid.NewRandom()
 	// newUUID, _ := uuid.NewUUID()
@@ -126,14 +124,14 @@ func (repo *authorRepo) Create(author *domain.Author) error {
 
 func (repo *authorRepo) Update(id string, author *domain.Author) error {
 
-	_, err := repo.DB.Exec("UPDATE books SET name = ?, bio = ?, birth_date = ?, nationality = ? WHERE id = ?",
+	_, err := repo.DB.Exec("UPDATE authors SET name = ?, bio = ?, birth_date = ?, nationality = ? WHERE id = ?",
 		author.Name, author.Bio, author.BirthDate, author.Nationality, id)
 	return err
 }
 
 func (repo *authorRepo) Delete(id string) error {
 
-	_, err := repo.DB.Exec("DELETE FROM books WHERE id = ?", id)
+	_, err := repo.DB.Exec("DELETE FROM authors WHERE id = ?", id)
 
 	return err
 }

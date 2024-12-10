@@ -1,26 +1,26 @@
 package main
 
 import (
+	httpRoutes "altech-omega-api/transport/http"
 	"database/sql"
 	"fmt"
-	httpRoutes "altech-omega-api/transport/http"
-	"github.com/spf13/viper"
+
 	"github.com/labstack/echo"
+	"github.com/spf13/viper"
 
 	//// driver for pgsql
 	// _ "github.com/lib/pq"
 
 	//// driver for mysql
-	 _ "github.com/go-sql-driver/mysql"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 func main() {
 	viper.SetConfigFile("env.yaml")
 	if err := viper.ReadInConfig(); err != nil {
-        panic(err)
-    }
+		panic(err)
+	}
 
-	// postgresql
 	dbHost := viper.GetString("database.host")
 	dbUser := viper.GetString("database.username")
 	dbPort := viper.GetInt("database.port")
@@ -33,7 +33,7 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	
+
 	err = db.Ping()
 	if err != nil {
 		fmt.Println(err)
@@ -45,5 +45,5 @@ func main() {
 	httpRoutes.StartHttp(e, db)
 
 	port := viper.GetInt("server.port")
-    e.Start(fmt.Sprintf(":%d", port))
+	e.Start(fmt.Sprintf(":%d", port))
 }
