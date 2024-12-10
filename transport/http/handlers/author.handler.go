@@ -26,6 +26,7 @@ func AuthorRoute(e *echo.Echo, uc domain.AuthorUsecase) {
 
 	e.GET("/author", handler.GetAllHandler)
 	e.GET("/author/:id", handler.GetByIDHandler)
+	e.GET("/author/:id/books", handler.GetByIDWithBooksHandler)
 	e.POST("/author", handler.Create)
 	e.PUT("/author/:id", handler.UpdateHandler)
 	e.DELETE("/author/:id", handler.DeleteHandler)
@@ -61,6 +62,24 @@ func (h *AuthorHandler) GetByIDHandler(c echo.Context) error {
 	return resp
 }
 
+func (h *AuthorHandler) GetByIDWithBooksHandler(c echo.Context) error {
+	id := c.Param("id")
+	// id = fmt.Sprintf("%s")
+	// num, err := strconv.Atoi(id)
+
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	data, err := h.usecase.GetByIDWithBooks(id)
+
+	if err != nil {
+		return helper_http.ErrorResponse(c, err)
+	}
+
+	resp := helper_http.SuccessResponse(c, data, "success get by id with author's book")
+	return resp
+}
 
 func (h *AuthorHandler) Create(c echo.Context) error {
 	var data domain.Author

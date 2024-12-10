@@ -68,6 +68,7 @@ func (repo *authorRepo) GetByIDWithBooks(id string) (domain.Author, error) {
 		au.id,
 		au.name,
 		au.bio,
+		au.birth_date,
 		au.nationality,
 		b.id,
 		b.title,
@@ -82,7 +83,7 @@ func (repo *authorRepo) GetByIDWithBooks(id string) (domain.Author, error) {
 	 	books b
 	 ON
 	 	b.author_id = au.id
-	 WHERE id=?
+	 WHERE au.id=?
 	`
 	rows, err := repo.DB.Query(query, id)
 	fmt.Println(id)
@@ -96,11 +97,16 @@ func (repo *authorRepo) GetByIDWithBooks(id string) (domain.Author, error) {
 		err := rows.Scan(&data.ID, &data.Name, &data.Bio, &data.BirthDate,
 			&data.Nationality, &book.ID, &book.Title, &book.AuthorID, &book.PublishDate,
 			&book.Description, &book.Pages, &book.Genre)
+
+		if book.ID != "" {
+			books = append(books, book)
+		} else {
+			return data, fmt.Errorf("data book is not avalaible")
+		}
+
 		if err != nil {
 			return data, err
 		}
-
-		books = append(books, book)
 	}
 
 	data.Books = books
