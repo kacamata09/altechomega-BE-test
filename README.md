@@ -22,3 +22,10 @@ Run file main.go in app directory
 ```
 go run main.go
 ```
+
+### Add Docs
+1. Run command below:  
+```
+swag init
+```
+2. Visit route /swagger/, example "http://localhost:9999/swagger/
