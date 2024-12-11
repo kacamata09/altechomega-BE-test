@@ -14,7 +14,6 @@ func TestAuthorRepo_GetAll(t *testing.T) {
 	assert.NoError(t, err)
 	defer db.Close()
 
-	// Mock query and result
 	rows := sqlmock.NewRows([]string{"id", "name", "bio", "birth_date", "nationality", "created_at", "updated_at"}).
 		AddRow("1156e695-8043-4c51-a9ae-d05e0eba9b2c", "Anshar", "Orangnya baik sekali", "2000-08-03", "Indonesia", "2024-12-10", "2024-12-10").
 		AddRow("35a16b5d-8eca-4055-a4d3-a62a355aeab8", "Si Golang", "Anaknya pintar", "2007-03-05", "Amerika", "2024-12-10", "2024-12-10")
@@ -36,32 +35,35 @@ func TestAuthorRepo_GetByID(t *testing.T) {
 
 	row := sqlmock.NewRows([]string{"id", "name", "bio", "birth_date", "nationality", "created_at", "updated_at"}).
 		AddRow("1156e695-8043-4c51-a9ae-d05e0eba9b2c", "Anshar", "Orangnya baik sekali", "2000-08-03", "Indonesia", "2024-12-10", "2024-12-10")
-	mock.ExpectQuery("SELECT \\* FROM authors where id=\\?").WithArgs("1").WillReturnRows(row)
+	mock.ExpectQuery("SELECT \\* FROM authors where id=\\?").WithArgs("1156e695-8043-4c51-a9ae-d05e0eba9b2c").WillReturnRows(row)
 
 	repo := repositoryMySql.CreateAuthorRepo(db)
 
-	author, err := repo.GetByID("1")
+	author, err := repo.GetByID("1156e695-8043-4c51-a9ae-d05e0eba9b2c")
 	assert.NoError(t, err)
 	assert.Equal(t, "Anshar", author.Name)
 	assert.Equal(t, "Indonesia", author.Nationality)
 }
 
-// func TestAuthorRepo_GetByIDWithBooks(t *testing.T) {
-// 	db, mock, err := sqlmock.New()
-// 	assert.NoError(t, err)
-// 	defer db.Close()
+func TestAuthorRepo_GetByIDWithBooks(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	assert.NoError(t, err)
+	defer db.Close()
 
-// 	row := sqlmock.NewRows([]string{"id", "name", "bio", "birth_date", "nationality", "created_at", "updated_at"}).
-// 		AddRow("1156e695-8043-4c51-a9ae-d05e0eba9b2c", "Anshar", "Orangnya baik sekali", "2000-08-03", "Indonesia", "2024-12-10", "2024-12-10")
-// 	mock.ExpectQuery("SELECT \\* FROM authors where id=\\?").WithArgs("1").WillReturnRows(row)
+	rows := sqlmock.NewRows([]string{"id", "name", "bio", "birth_date", "nationality", "id", "title", "author_id", "publish_date", "description", "pages", "genre"}).
+		AddRow("1156e695-8043-4c51-a9ae-d05e0eba9b2c", "Anshar", "Orangnya baik sekali", "2000-08-03", "Indonesia", "1156e695-8043-4c51-a9ae-d05e0eba9b2c", "The 5AM Club", "1156e695-8043-4c51-a9ae-d05e0eba9b2c", "2010-10-01", "Bangun pagi supaya sukses", 100, "Self Development").
+		AddRow("1156e695-8043-4c51-a9ae-d05e0eba9b2c", "Anshar", "Orangnya baik sekali", "2000-08-03", "Indonesia", "2", "Hyouka", "1156e695-8043-4c51-a9ae-d05e0eba9b2c", "2005-08-04", "Oreki Houtarou", 150, "Light Novel")
+	mock.ExpectQuery("SELECT .* FROM authors au LEFT JOIN books b ON b.author_id = au.id WHERE au.id=\\?").WithArgs("1156e695-8043-4c51-a9ae-d05e0eba9b2c").WillReturnRows(rows)
 
-// 	repo := repositoryMySql.CreateAuthorRepo(db)
+	repo := repositoryMySql.CreateAuthorRepo(db)
 
-// 	author, err := repo.GetByIDWithBooks("1")
-// 	assert.NoError(t, err)
-// 	assert.Equal(t, "Anshar", author.Name)
-// 	assert.Equal(t, "Indonesia", author.Nationality)
-// }
+	author, err := repo.GetByIDWithBooks("1156e695-8043-4c51-a9ae-d05e0eba9b2c")
+	assert.NoError(t, err)
+	assert.Equal(t, "Anshar", author.Name)
+	assert.Equal(t, 2, len(author.Books))
+	assert.Equal(t, "The 5AM Club", author.Books[0].Title)
+	assert.Equal(t, "Hyouka", author.Books[1].Title)
+}
 
 func TestAuthorRepo_Create(t *testing.T) {
 	db, mock, err := sqlmock.New()
@@ -91,16 +93,16 @@ func TestAuthorRepo_Update(t *testing.T) {
 	defer db.Close()
 
 	mock.ExpectExec("UPDATE authors SET name = \\?, bio = \\?, birth_date = \\?, nationality = \\? WHERE id = \\?").
-		WithArgs("Updated Author", "Updated Bio", "2000-01-01", "Updated Nationality", "1156e695-8043-4c51-a9ae-d05e0eba9b2c").
+		WithArgs("Anshar Anshar", "Orangnya Pakai Kacamata", "1945-08-17", "Jepang", "1156e695-8043-4c51-a9ae-d05e0eba9b2c").
 		WillReturnResult(sqlmock.NewResult(0, 1))
 
 	repo := repositoryMySql.CreateAuthorRepo(db)
 
 	author := &domain.Author{
-		Name:        "Updated Author",
-		Bio:         "Updated Bio",
-		BirthDate:   "2000-01-01",
-		Nationality: "Updated Nationality",
+		Name:        "Anshar Anshar",
+		Bio:         "Orangnya Pakai Kacamata",
+		BirthDate:   "1945-08-17",
+		Nationality: "Jepang",
 	}
 
 	err = repo.Update("1156e695-8043-4c51-a9ae-d05e0eba9b2c", author)
