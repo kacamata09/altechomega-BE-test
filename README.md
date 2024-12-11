@@ -24,8 +24,16 @@ go run main.go
 ```
 
 ### Add Docs
-1. Run command below:  
+1. Install module below:
+```
+go install github.com/swaggo/swag/cmd/swag@latest
+```
+2. If you haven't yet config go path, then run command:
+```
+export PATH=$PATH:$HOME/go/bin
+```
+3. After that, then run command below:  
 ```
 swag init
 ```
-2. Visit route /swagger/, example "http://localhost:9999/swagger/
+4. Visit route /swagger/, example "http://localhost:9999/swagger/
