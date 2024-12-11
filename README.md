@@ -1,17 +1,24 @@
-## setup
+### First Setup
+1. Make copy from .env.yaml.example and rename to .env.yaml
+1. You can settings your environment in env.yaml  
+3. Run command below to install module dependency
+```
+go mod tidy
+```
 
-### Environment configuration
-You can settings your environment in env.yaml  
 ### Database migration
 1. Create database as in your env.yaml
-2. Run migration with following docs in https://github.com/golang-migrate/migrate  
-   Example :  
+2. Change directory to migrations in terminal
 ```
-migrate -path ./migrations/mysql -database "mysql://root:password@tcp(127.0.0.1:3306)/dbname" up
+cd migrations
 ```
-3. You can change database to mysql if change package driver sql and config_connection at main.go  
+3. Run file main.go in that directory
+```
+go run main.go
+```
 
 ### Run App
+Run file main.go in app directory  
 ```
 go run main.go
 ```
