@@ -7,12 +7,16 @@ import (
 	"altech-omega-api/transport/http/middleware"
 	"altech-omega-api/usecase"
 	"net/http"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
+	echoSwagger "github.com/swaggo/echo-swagger" 
+	_ "altech-omega-api/docs" 
 )
+
 
 type Home struct {
 	Message string `json:"message"`
 }
+
 
 func homeHandler(c echo.Context) error {
 	data := Home{
@@ -26,6 +30,11 @@ func StartHttp(e *echo.Echo, db *sql.DB) {
 	e.Use(middleware.CORS)
 
 	e.GET("/", homeHandler)
+
+    e.GET("/swagger/", func(c echo.Context) error {
+        return c.Redirect(http.StatusMovedPermanently, "/swagger")
+    })
+    e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	authorRepo := repositoryMySql.CreateAuthorRepo(db)
 	authorUseCase := usecase.CreateAuthorUseCase(authorRepo)

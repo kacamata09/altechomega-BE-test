@@ -1,21 +1,21 @@
 package handler
 
 import (
-	// "fmt"
-
 	"altech-omega-api/domain"
 	helper_http "altech-omega-api/transport/http/helper"
 	"net/http"
 
-	// "strconv"
-
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 type BookHandler struct {
 	usecase domain.BookUsecase
 }
 
+// BookRoute registers routes for book operations
+// @Summary Book Routes
+// @Description Routes related to book management
+// @ID book-routes
 func BookRoute(e *echo.Echo, uc domain.BookUsecase) {
 	handler := BookHandler{
 		usecase: uc,
@@ -31,6 +31,15 @@ func BookRoute(e *echo.Echo, uc domain.BookUsecase) {
 	e.DELETE("/book/:id", handler.DeleteHandler)
 }
 
+// GetAllHandler handles the request to get all books
+// @Summary Get all books
+// @Description Retrieve a list of all books
+// @ID get-all-books
+// @Produce json
+// @Success 200 {array} domain.Book
+// @Failure 500 {object} helper_http.Response
+// @Tags Book
+// @Router /book [get]
 func (h *BookHandler) GetAllHandler(c echo.Context) error {
 	data, err := h.usecase.GetAll()
 
@@ -42,14 +51,19 @@ func (h *BookHandler) GetAllHandler(c echo.Context) error {
 	return resp
 }
 
+// GetByIDHandler handles the request to get a book by ID
+// @Summary Get a book by ID
+// @Description Retrieve a book by its unique ID
+// @ID get-book-by-id
+// @Produce json
+// @Param id path string true "Book ID"
+// @Success 200 {object} domain.Book
+// @Failure 404 {object} helper_http.Response
+// @Failure 500 {object} helper_http.Response
+// @Tags Book
+// @Router /book/{id} [get]
 func (h *BookHandler) GetByIDHandler(c echo.Context) error {
 	id := c.Param("id")
-	// id = fmt.Sprintf("%s")
-	// num, err := strconv.Atoi(id)
-
-	// if err != nil {
-	// 	panic(err)
-	// }
 
 	data, err := h.usecase.GetByID(id)
 
@@ -61,7 +75,18 @@ func (h *BookHandler) GetByIDHandler(c echo.Context) error {
 	return resp
 }
 
-
+// Create handles the request to create a new book
+// @Summary Create a new book
+// @Description Create a new book record
+// @ID create-book
+// @Accept json
+// @Produce json
+// @Param book body domain.Book true "Book data"
+// @Success 201 {object} domain.Book
+// @Failure 400 {object} helper_http.Response
+// @Failure 422 {object} helper_http.Response
+// @Tags Book
+// @Router /book [post]
 func (h *BookHandler) Create(c echo.Context) error {
 	var data domain.Book
 
@@ -78,6 +103,20 @@ func (h *BookHandler) Create(c echo.Context) error {
 	return helper_http.SuccessResponse(c, data, "success create book")
 }
 
+// UpdateHandler handles the request to update a book by ID
+// @Summary Update a book by ID
+// @Description Update an existing book record by its ID
+// @ID update-book-by-id
+// @Accept json
+// @Produce json
+// @Param id path string true "Book ID"
+// @Param book body domain.Book true "Updated book data"
+// @Success 200 {object} domain.Book
+// @Failure 400 {object} helper_http.Response
+// @Failure 404 {object} helper_http.Response
+// @Failure 500 {object} helper_http.Response
+// @Tags Book
+// @Router /book/{id} [put]
 func (h *BookHandler) UpdateHandler(c echo.Context) error {
 	id := c.Param("id")
 
@@ -98,6 +137,16 @@ func (h *BookHandler) UpdateHandler(c echo.Context) error {
 	return resp
 }
 
+// DeleteHandler handles the request to delete a book by ID
+// @Summary Delete a book by ID
+// @Description Delete a book record by its ID
+// @ID delete-book-by-id
+// @Param id path string true "Book ID"
+// @Success 200 {object} helper_http.Response
+// @Failure 404 {object} helper_http.Response
+// @Failure 500 {object} helper_http.Response
+// @Tags Book
+// @Router /book/{id} [delete]
 func (h *BookHandler) DeleteHandler(c echo.Context) error {
 	id := c.Param("id")
 
