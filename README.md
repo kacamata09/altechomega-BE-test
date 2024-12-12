@@ -36,4 +36,4 @@ export PATH=$PATH:$HOME/go/bin
 ```
 swag init
 ```
-4. Visit route /swagger/, example "http://localhost:9999/swagger/
+4. Visit route /swagger/, example `http://localhost:9999/swagger//`
